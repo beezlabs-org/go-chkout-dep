@@ -1,0 +1,53 @@
+name: Go Checkout Install Dependencies
+description: Action to checkout a Go project and install dependencies
+inputs:
+  go:
+    description: Go version
+    required: false
+    default: "1.18"
+  auth-token:
+    description: Go Auth token
+    required: false
+    default: ""
+  build-proto:
+    description: Build proto files
+    required: false
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure Git
+      run: |
+        git config --global url."https://${{ inputs.auth-token }}@github.com/".insteadOf https://github.com/
+      shell: bash
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: "^${{ inputs.go }}"
+
+    - name: Download and Install Protoc
+      if: ${{ inputs.build-proto }} == "true"
+      run: |
+        curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip -o ~/protoc-3.19.4-linux-x86_64.zip -s
+        mkdir ~/protobuf
+        unzip ~/protoc-3.19.4-linux-x86_64.zip -d ~/protobuf
+        sudo ln -s ~/protobuf/bin/protoc /usr/local/bin/protoc
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+      shell: bash
+
+    - name: Build Protobuffers
+      if: ${{ inputs.build-proto }} == "true"
+      run: |
+        chmod +x ./hack/generate_proto.sh
+        ./hack/generate_proto.sh
+      shell: bash
+
+    - name: Install Dependencies
+      run: |
+        go mod download
+      shell: bash
