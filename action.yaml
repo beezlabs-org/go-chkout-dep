@@ -20,7 +20,7 @@ runs:
       uses: actions/checkout@v2
 
     - name: Configure Git
-      if: ${{ inputs.auth-token }} != ""
+      if: ${{ inputs.auth-token != '' }}
       run: |
         git config --global url."https://${{ inputs.auth-token }}@github.com/".insteadOf https://github.com/
       shell: bash
@@ -31,7 +31,7 @@ runs:
         go-version: "~${{ inputs.go }}"
 
     - name: Download and Install Protoc
-      if: ${{ inputs.build-proto }} == "true"
+      if: ${{ inputs.build-proto == 'true' }}
       run: |
         curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip -o ~/protoc-3.19.4-linux-x86_64.zip -s
         mkdir ~/protobuf
@@ -42,7 +42,7 @@ runs:
       shell: bash
 
     - name: Build Protobuffers
-      if: ${{ inputs.build-proto }} == "true"
+      if: ${{ inputs.build-proto == 'true' }}
       run: |
         chmod +x ./hack/generate_proto.sh
         ./hack/generate_proto.sh
