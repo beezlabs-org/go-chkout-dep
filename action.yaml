@@ -20,6 +20,7 @@ runs:
       uses: actions/checkout@v2
 
     - name: Configure Git
+      if: ${{ inputs.auth-token }} != ""
       run: |
         git config --global url."https://${{ inputs.auth-token }}@github.com/".insteadOf https://github.com/
       shell: bash
