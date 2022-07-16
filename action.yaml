@@ -28,7 +28,7 @@ runs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: "^${{ inputs.go }}"
+        go-version: "~${{ inputs.go }}"
 
     - name: Download and Install Protoc
       if: ${{ inputs.build-proto }} == "true"
